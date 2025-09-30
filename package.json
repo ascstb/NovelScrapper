@@ -1,0 +1,31 @@
+{
+  "name": "novelscrapper",
+  "version": "1.0.0",
+  "description": "Scrap Novel contents",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ascstb/NovelScrapper.git"
+  },
+  "keywords": [
+    "Web",
+    "Novel",
+    "Scrapper"
+  ],
+  "author": "Arturo Sanchez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ascstb/NovelScrapper/issues"
+  },
+  "homepage": "https://github.com/ascstb/NovelScrapper#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "firebase": "^12.3.0",
+    "mongoose": "^8.18.3",
+    "nodemon": "^3.1.10"
+  }
+}

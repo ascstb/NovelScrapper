@@ -188,10 +188,10 @@ const downloadNovel = async (req, res, next) => {
 
     for (let chapterNumber of chapters) {
       let chapterUrl = `${url}/${chapterNumber}`;
-      downloadChapter(
+      await downloadChapter(
         { query: { source, url: chapterUrl } },
-        { status: () => ({ json: () => {} }) },
-        () => {}
+        { status: () => ({ json: () => { } }) },
+        () => { }
       );
     }
 

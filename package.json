@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/ascstb/NovelScrapper#readme",
   "dependencies": {
+    "@gradio/client": "^1.19.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "firebase": "^12.3.0",

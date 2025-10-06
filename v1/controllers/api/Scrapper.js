@@ -77,7 +77,7 @@ const getChapterList = async (req, res, next) => {
 
     let result = [];
     for (let i = scrapResult.first; i <= scrapResult.last; i++) {
-      let chapterNumber = ("00" + i.toString()).slice(-3);
+      let chapterNumber = ("000" + i.toString()).slice(-4);
       let fileName = `Capitulo-${chapterNumber}.txt`;
       let fullEnglishPath = `${englishPath}/${fileName}`;
       let fullSpanishPath = `${spanishPath}/${fileName}`;
@@ -157,7 +157,7 @@ const downloadChapter = async (req, res, next) => {
     // Don't forget to close the browser instance to clean up the memory
     await browser.close();
 
-    let chapterNumberPadded = ("00" + chapterNumber.toString()).slice(-3);
+    let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
     let fileName = `Capitulo-${chapterNumberPadded}.txt`;
     let fullPath = `${englishPath}/${fileName}`;
 

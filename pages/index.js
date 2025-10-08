@@ -5,9 +5,14 @@ $(document).ready(function () {
   validateSession();
   init();
 
+  fetchVoiceModels();
+  fetchVoiceModelIndexes();
+  fetchTTSVoices();
+
   $("button.navbar-toggle").click();
 });
 
+//#region Search Novels
 const onSearchNovel = () => {
   let search = $("#txtSearch").val();
   if (search && search.length > 0) {
@@ -19,7 +24,9 @@ const fetchNovels = (search) => {
   //TODO: Fetch novels from Scrapper API
   console.log("Fetching novels for search: " + search);
 };
+//#endregion
 
+//#region Chapters
 const onGetChapters = () => {
   let sourceOption = $("input[name='sourceOptions']:checked").val();
   let urlSource = $("#urlSource").val();
@@ -60,7 +67,9 @@ const fetchChapters = (source, urlSource) => {
   };
   callAPI("GET", path, null, success, error);
 };
+//#endregion
 
+//#region Table Formatters and Options
 function downloadFormatter(value, row) {
   if (!value) {
     return `<button class="btn btn-primary btn-sm" onclick="onDownloadChapter('${row.link}')">
@@ -79,19 +88,19 @@ function translatedFormatter(value, row) {
   } else if (value) {
     return "Traducido";
   } else {
-    ""
+    ("");
   }
 }
 
 function convertedFormatter(value, row) {
   if (value) {
-    return "Convertido"
+    return "Convertido";
   } else if (row.translated) {
     return `<button class="btn btn-secondary btn-sm" onclick="onConvertChapter('${row.link}')">
               <i class="fa fa-cogs"></i> Convertir
             </button>`;
   } else {
-    ""
+    ("");
   }
 }
 
@@ -99,7 +108,7 @@ const updateChaptersTable = async () => {
   $("#chaptersTable").bootstrapTable("destroy");
   $("#chaptersTable").bootstrapTable({
     data: availableChapters,
-    buttonsClass: ''
+    buttonsClass: "",
   });
 };
 
@@ -143,7 +152,9 @@ function tableDownloadButton() {
     },
   };
 }
+//#endregion
 
+//#region Chapter Actions
 const onDownloadChapter = (link) => {
   console.log("Downloading chapter: " + link);
   let sourceOption = $("input[name='sourceOptions']:checked").val();
@@ -254,11 +265,11 @@ const onTranslateChapter = (link) => {
 
   var params = {
     novelName: novelName,
-    fileName: fileName
+    fileName: fileName,
   };
 
   callAPI("POST", path, JSON.stringify(params), success, error);
-}
+};
 
 const onConvertSelectedChapters = () => {
   let sourceOption = $("input[name='sourceOptions']:checked").val();
@@ -279,13 +290,42 @@ const onConvertSelectedChapters = () => {
 
   let chaptersList = [];
 
-  selectedChapters.forEach(ch => {
+  selectedChapters.forEach((ch) => {
     let urlParts = ch.link.split("/");
     let chapterNumber = urlParts[urlParts.length - 1];
     let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
     let fileName = `Capitulo-${chapterNumberPadded}.txt`;
     chaptersList.push(fileName);
   });
+
+  let voiceModel = $("#ddlVoiceModel").val();
+  let voiceModelIndex = $("#ddlVoiceModelIndex").val();
+  let ttsVoice = $("#ddlTTSVoice").val();
+
+  if (!voiceModel || voiceModel.length == 0) {
+    Swal.fire({
+      title: "Advertencia",
+      text: `Por favor selecciona un modelo de voz.`,
+      icon: "warning",
+    });
+    return;
+  }
+  if (!voiceModelIndex || voiceModelIndex.length == 0) {
+    Swal.fire({
+      title: "Advertencia",
+      text: `Por favor selecciona un índice de modelo de voz.`,
+      icon: "warning",
+    });
+    return;
+  }
+  if (!ttsVoice || ttsVoice.length == 0) {
+    Swal.fire({
+      title: "Advertencia",
+      text: `Por favor selecciona una voz TTS.`,
+      icon: "warning",
+    });
+    return;
+  }
 
   let params = {
     source: sourceOption,
@@ -341,7 +381,7 @@ const onTranslateSelectedChapters = () => {
 
   let chaptersList = [];
 
-  selectedChapters.forEach(ch => {
+  selectedChapters.forEach((ch) => {
     let urlParts = ch.link.split("/");
     let chapterNumber = urlParts[urlParts.length - 1];
     let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
@@ -380,3 +420,69 @@ const onTranslateSelectedChapters = () => {
   };
   callAPI("POST", path, JSON.stringify(params), success, error);
 };
+//#endregion
+
+//#region Voice Model Selection
+const fetchVoiceModels = () => {
+  let path = `${serverUrl}api/v1/getModels`;
+  var success = function (data) {
+    if (!data || data.length == 0 || data === "undefined") {
+      return;
+    }
+
+    let options = "";
+    data.forEach((model) => {
+      options += `<option value="${model}">${model}</option>`;
+    });
+
+    $("#ddlVoiceModel").html(options);
+  };
+
+  var error = function (err) {
+    console.error("Error fetching voice models:", err);
+  };
+  callAPI("GET", path, null, success, error);
+};
+
+const fetchVoiceModelIndexes = () => {
+  let path = `${serverUrl}api/v1/indexes`;
+  var success = function (data) {
+    if (!data || data.length == 0 || data === "undefined") {
+      return;
+    }
+
+    let options = "";
+    data.forEach((index) => {
+      options += `<option value="${index}">${index}</option>`;
+    });
+
+    $("#ddlVoiceModelIndex").html(options);
+  };
+
+  var error = function (err) {
+    console.error("Error fetching voice model indexes:", err);
+  };
+  callAPI("GET", path, null, success, error);
+};
+
+const fetchTTSVoices = () => {
+  let path = `${serverUrl}api/v1/voices`;
+  var success = function (data) {
+    if (!data || data.length == 0 || data === "undefined") {
+      return;
+    }
+
+    let options = "";
+    data.forEach((voice) => {
+      options += `<option value="${voice}">${voice}</option>`;
+    });
+
+    $("#ddlTTSVoice").html(options);
+  };
+
+  var error = function (err) {
+    console.error("Error fetching TTS voices:", err);
+  };
+  callAPI("GET", path, null, success, error);
+};
+//#endregion

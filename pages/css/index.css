@@ -35,7 +35,7 @@ h3.tit {
 }
 
 .icon {
-  vertical-align:middle;
+  vertical-align: middle;
 }
 
 .s2 {
@@ -56,4 +56,28 @@ h3.tit {
   float: left;
   font-size: 64px;
   text-align: center;
+}
+
+.btn-download {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+  background-color: #4e73df;
+  border-color: #4e73df;
+}
+
+.btn-translate {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+  background-color: #1cc88a;
+  border-color: #1cc88a;
+}
+
+.btn-convert {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+  background-color: #ff9900;
+  border-color: #ff9900;
 }

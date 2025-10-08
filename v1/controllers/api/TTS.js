@@ -4,6 +4,7 @@
 const { Client } = require("@gradio/client");
 const fs = require("fs");
 const spaceUrl = "http://127.0.0.1:6969";
+const path = require("path");
 
 const functionTest = async (req, res, next) => {
     try {
@@ -114,10 +115,10 @@ const getIndexes = async (req, res, next) => {
 const generateRVC = async (req, res, next) => {
     try {
         const apiEndpoint = "/generateRVC"; // Corresponds to the api_name
+        let { novelName } = req.body;
         const { voiceModel } = req.body;
         const { voiceModelIndex } = req.body;
         const { ttsVoice } = req.body;
-        const { rootFolder } = req.body;
         const { filesList } = req.body;
 
         //#region Validations
@@ -129,8 +130,8 @@ const generateRVC = async (req, res, next) => {
                 .json({ error: "voiceModelIndex param is required" });
         if (!ttsVoice)
             return res.status(400).json({ error: "ttsVoice param is required" });
-        if (!rootFolder)
-            return res.status(400).json({ error: "rootFolder param is required" });
+        if (!novelName)
+            return res.status(400).json({ error: "novelName param is required" });
         if (!filesList)
             return res.status(400).json({ error: "filesList param is required" });
         if (!Array.isArray(filesList))
@@ -138,8 +139,13 @@ const generateRVC = async (req, res, next) => {
                 .status(400)
                 .json({ error: "filesList param must be an array" });
 
+        let rootPath = `novels`;
+        let novelPath = `${rootPath}/${novelName}`;
+        let rootFolder = path.resolve(`${novelPath}/spanish`);
+
         for (const filePath of filesList) {
             let fullPath = `${rootFolder}\\${filePath}`;
+            console.log(fullPath);
             if (!fs.existsSync(fullPath)) {
                 return res
                     .status(400)
@@ -147,6 +153,7 @@ const generateRVC = async (req, res, next) => {
             }
         }
         //#endregion
+        return
 
         // 1. Connect to the Gradio Space (Equivalent to client = Client("..."))
         const client = await Client.connect(spaceUrl);

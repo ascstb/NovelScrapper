@@ -16,18 +16,15 @@ const getChapterList = async (req, res, next) => {
     //#region Extract min and max chapter numbers from the URL
     // Launch the browser
     const browser = await puppeteer.launch();
-    console.log(`Scrapper.js: start browser`);
 
     // Open a new tab
     const page = await browser.newPage();
-    console.log(`Scrapper.js_test: open new tab`);
 
     // Visit the page and wait until network connections are completed
     await page.goto(url, {
       // waitUntil: "networkidle2",
       waitUntil: "domcontentloaded",
     });
-    console.log(`Scrapper.js_test: go to page`);
 
     const scrapResult = await page.evaluate(() => {
       let select = [...document.querySelectorAll("a[rel='nofollow']")];
@@ -39,17 +36,13 @@ const getChapterList = async (req, res, next) => {
       let lastUrlParts = lastUrl.split("/");
       let last = parseInt(lastUrlParts[lastUrlParts.length - 1]);
 
-      select.forEach((element) => {
-        console.log(`Scrapper.js_test: element href: ${element.href}`);
-      });
-
       return {
         first: first,
         last: last,
       };
     });
     console.log(
-      `Scrapper.js_test: page.evaluate result: ${scrapResult.first} - ${scrapResult.last}`
+      `getChapterList: url: ${url}, range: ${scrapResult.first} - ${scrapResult.last}`
     );
 
     // Don't forget to close the browser instance to clean up the memory
@@ -57,10 +50,11 @@ const getChapterList = async (req, res, next) => {
     //#endregion
 
     let novelName = url.split("/")[4].replace(/-/g, " ");
-    let rootPath = `novels/`;
+    let rootPath = `novels`;
     let novelPath = `${rootPath}/${novelName}`;
     let englishPath = `${novelPath}/english`;
     let spanishPath = `${novelPath}/spanish`;
+    let rvcPath = `${spanishPath}/rvc`
 
     if (!fs.existsSync(rootPath)) {
       fs.mkdirSync(rootPath);
@@ -74,6 +68,9 @@ const getChapterList = async (req, res, next) => {
     if (!fs.existsSync(spanishPath)) {
       fs.mkdirSync(spanishPath);
     }
+    if (!fs.existsSync(rvcPath)) {
+      fs.mkdirSync(rvcPath);
+    }
 
     let result = [];
     for (let i = scrapResult.first; i <= scrapResult.last; i++) {
@@ -81,17 +78,22 @@ const getChapterList = async (req, res, next) => {
       let fileName = `Capitulo-${chapterNumber}.txt`;
       let fullEnglishPath = `${englishPath}/${fileName}`;
       let fullSpanishPath = `${spanishPath}/${fileName}`;
+      let fullRVCPath = `${rvcPath}/${fileName.replace("txt", "mp3")}`;
 
       let downloaded = fs.existsSync(fullEnglishPath);
       let translated = fs.existsSync(fullSpanishPath);
+      let converted = fs.existsSync(fullRVCPath);
 
-      result.push({
+      let temp = {
         chapterNumber: i,
+        fileName: fileName,
         title: `${fileName.replace(".txt", "").replace(/-/g, " ")}`,
         link: `${url}/${i}`,
         downloaded: downloaded,
         translated: translated,
-      });
+        converted: converted
+      }
+      result.push(temp);
     }
 
     return res.status(200).json(result);

@@ -22,7 +22,6 @@ const fetchNovels = (search) => {
 
 const onGetChapters = () => {
   let sourceOption = $("input[name='sourceOptions']:checked").val();
-  console.log("Selected source: " + sourceOption);
   let urlSource = $("#urlSource").val();
   if (!urlSource || urlSource.length == 0) {
     Swal.fire({
@@ -73,23 +72,40 @@ function downloadFormatter(value, row) {
 }
 
 function translatedFormatter(value, row) {
-  if (!value) {
-    return `<button class="btn btn-secondary btn-sm">
+  if (row.downloaded && !value) {
+    return `<button class="btn btn-secondary btn-sm" onclick="onTranslateChapter('${row.link}')">
               <i class="fa fa-book"></i> Traducir
             </button>`;
-  } else {
+  } else if (value) {
     return "Traducido";
+  } else {
+    ""
+  }
+}
+
+function convertedFormatter(value, row) {
+  if (value) {
+    return "Convertido"
+  } else if (row.translated) {
+    return `<button class="btn btn-secondary btn-sm" onclick="onConvertChapter('${row.link}')">
+              <i class="fa fa-cogs"></i> Convertir
+            </button>`;
+  } else {
+    ""
   }
 }
 
 const updateChaptersTable = async () => {
   $("#chaptersTable").bootstrapTable("destroy");
-  $("#chaptersTable").bootstrapTable({ data: availableChapters });
+  $("#chaptersTable").bootstrapTable({
+    data: availableChapters,
+    buttonsClass: ''
+  });
 };
 
 function tableDownloadButton() {
   return {
-    customButton1: {
+    downloadButton: {
       text: "Descargar seleccionados",
       icon: "fa-download", // Optional icon
       event: function () {
@@ -98,7 +114,31 @@ function tableDownloadButton() {
       attributes: {
         title: "Descargar capítulos seleccionados",
         id: "downloadSelectedChapters",
-        class: "btn btn-primary",
+        class: "btn-download",
+      },
+    },
+    translateButton: {
+      text: "Traducir seleccionados",
+      icon: "fa-book", // Optional icon
+      event: function () {
+        onTranslateSelectedChapters();
+      },
+      attributes: {
+        title: "Traducir capítulos seleccionados",
+        id: "translateSelectedChapters",
+        class: "btn-translate",
+      },
+    },
+    convertButton: {
+      text: "Convertir seleccionados",
+      icon: "fa-cogs", // Optional icon
+      event: function () {
+        onConvertSelectedChapters();
+      },
+      attributes: {
+        title: "Convertir capítulos seleccionados",
+        id: "convertSelectedChapters",
+        class: "btn-convert",
       },
     },
   };
@@ -172,6 +212,169 @@ const onDownloadSelectedChapters = () => {
     Swal.fire({
       title: "Error",
       text: `Ocurrió un error al descargar el capítulo.`,
+      icon: "error",
+    });
+  };
+  callAPI("POST", path, JSON.stringify(params), success, error);
+};
+
+const onTranslateChapter = (link) => {
+  console.log(`Translate chapter: ${link}`);
+  let urlSource = $("#urlSource").val();
+  let novelName = urlSource.split("/")[4].replace(/-/g, " ");
+
+  let urlParts = link.split("/");
+  let chapterNumber = urlParts[urlParts.length - 1];
+  let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
+  let fileName = `Capitulo-${chapterNumberPadded}.txt`;
+
+  let path = `${serverUrl}api/v1/translate-chapter`;
+
+  var success = function (data) {
+    console.log("Chapter translated successfully: ", data);
+    Swal.fire({
+      title: "Éxito",
+      text: `Capítulo traducido exitosamente.`,
+      icon: "success",
+    });
+    fetchChapters(
+      $("input[name='sourceOptions']:checked").val(),
+      $("#urlSource").val()
+    );
+  };
+
+  var error = function (err) {
+    console.error("Error translating chapter:", err);
+    Swal.fire({
+      title: "Error",
+      text: `Ocurrió un error al traducir el capítulo.`,
+      icon: "error",
+    });
+  };
+
+  var params = {
+    novelName: novelName,
+    fileName: fileName
+  };
+
+  callAPI("POST", path, JSON.stringify(params), success, error);
+}
+
+const onConvertSelectedChapters = () => {
+  let sourceOption = $("input[name='sourceOptions']:checked").val();
+  let urlSource = $("#urlSource").val();
+  let path = `${serverUrl}api/v1/generateRVC`;
+
+  let selectedChapters = $("#chaptersTable").bootstrapTable("getSelections");
+  if (!selectedChapters || selectedChapters.length == 0) {
+    Swal.fire({
+      title: "Advertencia",
+      text: `Por favor selecciona al menos un capítulo para convertir.`,
+      icon: "warning",
+    });
+    return;
+  }
+  console.log(`Converting selected chapters: ${selectedChapters.length}`);
+  let novelName = urlSource.split("/")[4].replace(/-/g, " ");
+
+  let chaptersList = [];
+
+  selectedChapters.forEach(ch => {
+    let urlParts = ch.link.split("/");
+    let chapterNumber = urlParts[urlParts.length - 1];
+    let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
+    let fileName = `Capitulo-${chapterNumberPadded}.txt`;
+    chaptersList.push(fileName);
+  });
+
+  let params = {
+    source: sourceOption,
+    voiceModel: voiceModel,
+    voiceModelIndex: voiceModelIndex,
+    ttsVoice: ttsVoice,
+    novelName: novelName,
+    filesList: chaptersList,
+  };
+
+  console.log(params);
+
+  var success = function (data) {
+    console.log("Chapters converted successfully:", data);
+    Swal.fire({
+      title: "Éxito",
+      text: `Capítulos convertidos exitosamente.`,
+      icon: "success",
+    });
+    fetchChapters(
+      $("input[name='sourceOptions']:checked").val(),
+      $("#urlSource").val()
+    );
+  };
+
+  var error = function (err) {
+    console.error("Error converting chapters:", err);
+    Swal.fire({
+      title: "Error",
+      text: `Ocurrió un error al traducir el capítulo.`,
+      icon: "error",
+    });
+  };
+  callAPI("POST", path, JSON.stringify(params), success, error);
+};
+
+const onTranslateSelectedChapters = () => {
+  let sourceOption = $("input[name='sourceOptions']:checked").val();
+  let urlSource = $("#urlSource").val();
+  let path = `${serverUrl}api/v1/translate-novel`;
+
+  let selectedChapters = $("#chaptersTable").bootstrapTable("getSelections");
+  if (!selectedChapters || selectedChapters.length == 0) {
+    Swal.fire({
+      title: "Advertencia",
+      text: `Por favor selecciona al menos un capítulo para traducir.`,
+      icon: "warning",
+    });
+    return;
+  }
+  console.log(`Translating selected chapters: ${selectedChapters.length}`);
+  let novelName = urlSource.split("/")[4].replace(/-/g, " ");
+
+  let chaptersList = [];
+
+  selectedChapters.forEach(ch => {
+    let urlParts = ch.link.split("/");
+    let chapterNumber = urlParts[urlParts.length - 1];
+    let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
+    let fileName = `Capitulo-${chapterNumberPadded}.txt`;
+    chaptersList.push(fileName);
+  });
+
+  let params = {
+    source: sourceOption,
+    novelName: novelName,
+    chaptersList: chaptersList,
+  };
+
+  console.log(params);
+
+  var success = function (data) {
+    console.log("Chapter translated successfully:", data);
+    Swal.fire({
+      title: "Éxito",
+      text: `Capítulos traducidos exitosamente.`,
+      icon: "success",
+    });
+    fetchChapters(
+      $("input[name='sourceOptions']:checked").val(),
+      $("#urlSource").val()
+    );
+  };
+
+  var error = function (err) {
+    console.error("Error translating chapters:", err);
+    Swal.fire({
+      title: "Error",
+      text: `Ocurrió un error al traducir el capítulo.`,
       icon: "error",
     });
   };

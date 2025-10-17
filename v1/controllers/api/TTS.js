@@ -1,14 +1,14 @@
 "use strict";
 //import { Client } from "@gradio/client";
 //import fs from "fs"
-//const { Client } = require("@gradio/client");
+const { Client } = require("@gradio/client");
 // With this:
-let Client;
+/*let Client;
 (async () => {
   const gradio = await import("@gradio/client");
   Client = gradio.Client;
   // You can now use Client here or export it as needed
-})();
+})();*/
 const fs = require("fs");
 const spaceUrl = "http://127.0.0.1:6969";
 const path = require("path");
@@ -152,7 +152,6 @@ const generateRVC = async (req, res, next) => {
 
     for (const filePath of filesList) {
       let fullPath = `${rootFolder}\\${filePath}`;
-      console.log(fullPath);
       if (!fs.existsSync(fullPath)) {
         return res
           .status(400)
@@ -160,7 +159,6 @@ const generateRVC = async (req, res, next) => {
       }
     }
     //#endregion
-    return;
 
     // 1. Connect to the Gradio Space (Equivalent to client = Client("..."))
     const client = await Client.connect(spaceUrl);

@@ -424,7 +424,7 @@ const onTranslateSelectedChapters = () => {
 
 //#region Voice Model Selection
 const fetchVoiceModels = () => {
-  let path = `${serverUrl}api/v1/getModels`;
+  let path = `${serverUrl}api/v1/models`;
   var success = function (data) {
     if (!data || data.length == 0 || data === "undefined") {
       return;
@@ -436,6 +436,7 @@ const fetchVoiceModels = () => {
     });
 
     $("#ddlVoiceModel").html(options);
+    $("#ddlVoiceModel").selectpicker();
   };
 
   var error = function (err) {
@@ -451,12 +452,14 @@ const fetchVoiceModelIndexes = () => {
       return;
     }
 
-    let options = "";
+    let ddlVoiceModelIndex = $("#ddlVoiceModelIndex");
+    ddlVoiceModelIndex.empty();
+
     data.forEach((index) => {
-      options += `<option value="${index}">${index}</option>`;
+      ddlVoiceModelIndex.append($("<option></option").val(index).html(index));
     });
 
-    $("#ddlVoiceModelIndex").html(options);
+    ddlVoiceModelIndex.selectpicker();
   };
 
   var error = function (err) {
@@ -472,12 +475,14 @@ const fetchTTSVoices = () => {
       return;
     }
 
-    let options = "";
+    let ddlTTSVoice = $("#ddlTTSVoice");
+    ddlTTSVoice.empty();
+
     data.forEach((voice) => {
-      options += `<option value="${voice}">${voice}</option>`;
+      ddlTTSVoice.append($("<option></option").val(voice).html(voice));
     });
 
-    $("#ddlTTSVoice").html(options);
+    ddlTTSVoice.selectpicker();
   };
 
   var error = function (err) {

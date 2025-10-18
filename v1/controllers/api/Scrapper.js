@@ -26,30 +26,10 @@ const getChapterList = async (req, res, next) => {
       waitUntil: "domcontentloaded",
     });
 
-    const scrapResult = await page.evaluate(() => {
-      let select = [...document.querySelectorAll("a[rel='nofollow']")];
-      let firstUrl = select[0].getAttribute("href");
-      let firstUrlParts = firstUrl.split("/");
-      let first = parseInt(firstUrlParts[firstUrlParts.length - 1]);
-
-      let lastUrl = select[1].getAttribute("href");
-      let lastUrlParts = lastUrl.split("/");
-      let last = parseInt(lastUrlParts[lastUrlParts.length - 1]);
-
-      return {
-        first: first,
-        last: last,
-      };
-    });
-    console.log(
-      `getChapterList: url: ${url}, range: ${scrapResult.first} - ${scrapResult.last}`
-    );
-
-    // Don't forget to close the browser instance to clean up the memory
-    await browser.close();
-    //#endregion
-
+    //#region Folder Structure
+    let scrapResult = "";
     let novelName = url.split("/")[4].replace(/-/g, " ");
+
     let rootPath = `novels`;
     let novelPath = `${rootPath}/${novelName}`;
     let englishPath = `${novelPath}/english`;
@@ -71,6 +51,45 @@ const getChapterList = async (req, res, next) => {
     if (!fs.existsSync(rvcPath)) {
       fs.mkdirSync(rvcPath);
     }
+    //#endregion
+
+    if (source == "empireNovel") {
+      try {
+        scrapResult = await page.evaluate(() => {
+          let select = [...document.querySelectorAll("a[rel='nofollow']")];
+          let firstUrl = select[0].getAttribute("href");
+          let firstUrlParts = firstUrl.split("/");
+          let first = parseInt(firstUrlParts[firstUrlParts.length - 1]);
+
+          let lastUrl = select[1].getAttribute("href");
+          let lastUrlParts = lastUrl.split("/");
+          let last = parseInt(lastUrlParts[lastUrlParts.length - 1]);
+
+          return {
+            first: first,
+            last: last,
+          };
+        });
+      } catch (error) {
+        console.log(`from cache becuse: ${error.message}`);
+        const fileNameList = fs.readdirSync(englishPath).sort();
+        let firstChapter = parseInt(fileNameList[0].replace("Capitulo-", "").replace(".txt", ""));
+        let lastChapter = parseInt(fileNameList[fileNameList.length - 1].replace("Capitulo-", "").replace(".txt", ""));
+
+        scrapResult = {
+          first: firstChapter,
+          last: lastChapter
+        }
+      }
+    }
+
+    console.log(
+      `getChapterList: url: ${url}, range: ${scrapResult.first} - ${scrapResult.last}`
+    );
+
+    // Don't forget to close the browser instance to clean up the memory
+    await browser.close();
+    //#endregion
 
     let result = [];
     for (let i = scrapResult.first; i <= scrapResult.last; i++) {

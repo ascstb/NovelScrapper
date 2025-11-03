@@ -81,3 +81,25 @@ h3.tit {
   background-color: #ff9900;
   border-color: #ff9900;
 }
+
+/* loader overlay */
+#loaderContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none; /* toggle with .show class or JS */
+  align-items: center; /* center spinner vertically */
+  justify-content: center; /* center spinner horizontally */
+  background: rgba(0, 0, 0, 0.35); /* dim backdrop */
+  z-index: 9999; /* on top of everything */
+}
+
+#loaderMessage {
+  color: #fff;
+  margin-left: 20px;
+  margin-top: 10px;
+  font-size: 2em;
+  text-align: center;
+}

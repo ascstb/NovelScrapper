@@ -54,3 +54,13 @@ const initUI = async () => {
     $(this).find("[autofocus]").focus();
   });
 };
+
+const showLoader = (message) => {
+  $("#loaderContainer").css("display", "flex");
+  $("#loaderMessage").text(message);
+};
+
+const hideLoader = () => {
+  $("#loaderContainer").css("display", "none");
+  $("#loaderMessage").text("");
+};

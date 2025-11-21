@@ -1,0 +1,20 @@
+{{#each this}}
+<div class="row source-entry" data-source-id="{{_id}}">
+    <div class="col-sm-2">
+        <select class="form-control content-type">
+            <option value="text" {{#ifCond type '==' 'text' }}selected{{/ifCond}}>Texto</option>
+            <option value="file" {{#ifCond type '==' 'file' }}selected{{/ifCond}}>Archivo</option>
+        </select>
+    </div>
+    <div class="col-sm-6">
+        {{#ifCond type '==' 'text'}}
+        <input type="text" class="form-control source-content" value="{{content}}" />
+        {{else ifCond type '==' 'file'}}
+        <input type="file" class="form-control source-content-file" />
+        {{/ifCond}}
+    </div>
+    <div class="col-sm-4">
+        <button class="btn btn-danger btnRemoveSource"><i class="fa fa-trash"></i> Eliminar</button>
+    </div>
+</div>
+{{/each}}

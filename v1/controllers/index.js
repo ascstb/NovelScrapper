@@ -5,6 +5,10 @@ const Scrapper = require("./api/Scrapper");
 const TTS = require("./api/TTS");
 const Translator = require("./api/Translator");
 
+const Series = require("./api/Series");
+const Groups = require("./api/Groups");
+const Chapters = require("./api/Chapter");
+
 const Home = require("./pages/Home");
 
 module.exports = {
@@ -13,4 +17,8 @@ module.exports = {
   ScrapperCtrl: Scrapper,
   TTSCtrl: TTS,
   TranslatorCtrl: Translator,
+
+  SeriesCtrl: Series,
+  GroupsCtrl: Groups,
+  ChaptersCtrl: Chapters,
 };

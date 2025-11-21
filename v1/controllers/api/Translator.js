@@ -25,7 +25,7 @@ const translate = async (novelName, fileName) => {
 
         const baseUrl = "http://localhost:11434/api/generate";
         const payload = {
-            model: "aya-expanse",
+            model: "gemma3:12b",
             prompt: `Translate the following English text to Mexican Spanish (es-MX). Output only the translation, without any additional text or explanations.\n\nText:\n${paragraph}`,
             stream: false,
         };
@@ -37,7 +37,7 @@ const translate = async (novelName, fileName) => {
 
         count++;
         progress = (count / paragraphs.length) * 100;
-        console.log(`Translator.js: translate: ${englishPath}, progress: ${progress.toFixed(2)} %`)
+        console.log(`${(new Date()).toISOString()} - Translator.js: translate: ${englishPath}, progress: ${progress.toFixed(2)} %`)
     }
 
     var onTranslateError = function (err) {

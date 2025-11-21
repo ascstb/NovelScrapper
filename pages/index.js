@@ -285,18 +285,20 @@ const onConvertSelectedChapters = () => {
     });
     return;
   }
-  console.log(`Converting selected chapters: ${selectedChapters.length}`);
   let novelName = urlSource.split("/")[4].replace(/-/g, " ");
 
   let chaptersList = [];
 
   selectedChapters.forEach((ch) => {
+    if (ch.converted || !ch.translated || !ch.downloaded) return
+
     let urlParts = ch.link.split("/");
     let chapterNumber = urlParts[urlParts.length - 1];
     let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
     let fileName = `Capitulo-${chapterNumberPadded}.txt`;
     chaptersList.push(fileName);
   });
+  console.log(`Converting selected chapters: ${selectedChapters.length}`);
 
   let voiceModel = $("#ddlVoiceModel").val();
   let voiceModelIndex = $("#ddlVoiceModelIndex").val();
@@ -382,6 +384,8 @@ const onTranslateSelectedChapters = () => {
   let chaptersList = [];
 
   selectedChapters.forEach((ch) => {
+    if (ch.translated || ch.converted || !ch.downloaded) return
+
     let urlParts = ch.link.split("/");
     let chapterNumber = urlParts[urlParts.length - 1];
     let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);

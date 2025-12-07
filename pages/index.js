@@ -65,6 +65,7 @@ const fetchChapters = (source, urlSource) => {
   var error = function (err) {
     console.error("Error fetching chapters:", err);
   };
+  console.log(`Fetching chapters from ${path}`);
   callAPI("GET", path, null, success, error);
 };
 //#endregion
@@ -72,7 +73,7 @@ const fetchChapters = (source, urlSource) => {
 //#region Table Formatters and Options
 function downloadFormatter(value, row) {
   if (!value) {
-    return `<button class="btn btn-primary btn-sm" onclick="onDownloadChapter('${row.link}')">
+    return `<button class="btn btn-primary btn-sm" onclick="onDownloadChapter('${row.link}', ${row.chapterNumber})">
               <i class="fa fa-download"></i> Descargar
             </button>`;
   } else {
@@ -155,10 +156,10 @@ function tableDownloadButton() {
 //#endregion
 
 //#region Chapter Actions
-const onDownloadChapter = (link) => {
+const onDownloadChapter = (link, chapterNumber) => {
   console.log("Downloading chapter: " + link);
   let sourceOption = $("input[name='sourceOptions']:checked").val();
-  let path = `${serverUrl}api/v1/download-chapter?source=${sourceOption}&url=${link}`;
+  let path = `${serverUrl}api/v1/download-chapter?source=${sourceOption}&url=${link}&chapterNumber=${chapterNumber}`;
   var success = function (data) {
     console.log("Chapter downloaded successfully:", data);
     Swal.fire({
@@ -185,7 +186,6 @@ const onDownloadChapter = (link) => {
 
 const onDownloadSelectedChapters = () => {
   let sourceOption = $("input[name='sourceOptions']:checked").val();
-  let urlSource = $("#urlSource").val();
   let path = `${serverUrl}api/v1/download-novel`;
 
   let selectedChapters = $("#chaptersTable").bootstrapTable("getSelections");
@@ -197,12 +197,21 @@ const onDownloadSelectedChapters = () => {
     });
     return;
   }
+
+  let urls = [];
+  let chapters = [];
+  selectedChapters.forEach((ch) => {
+    if (ch.downloaded) return;
+    urls.push(ch.link);
+    chapters.push(ch.chapterNumber);
+  });
+
   console.log(`Downloading selected chapters: ${selectedChapters.length}`);
 
   let params = {
     source: sourceOption,
-    url: urlSource,
-    chapters: selectedChapters.map((c) => c.chapterNumber),
+    url: urls,
+    chapters: chapters,
   };
 
   var success = function (data) {
@@ -290,7 +299,7 @@ const onConvertSelectedChapters = () => {
   let chaptersList = [];
 
   selectedChapters.forEach((ch) => {
-    if (ch.converted || !ch.translated || !ch.downloaded) return
+    if (ch.converted || !ch.translated || !ch.downloaded) return;
 
     let urlParts = ch.link.split("/");
     let chapterNumber = urlParts[urlParts.length - 1];
@@ -384,7 +393,7 @@ const onTranslateSelectedChapters = () => {
   let chaptersList = [];
 
   selectedChapters.forEach((ch) => {
-    if (ch.translated || ch.converted || !ch.downloaded) return
+    if (ch.translated || ch.converted || !ch.downloaded) return;
 
     let urlParts = ch.link.split("/");
     let chapterNumber = urlParts[urlParts.length - 1];

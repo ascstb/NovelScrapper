@@ -64,7 +64,7 @@ const getVoices = async (req, res, next) => {
 
     return res.status(200).json(finalResult);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res.status(500).json({ error: err });
   }
 };
@@ -89,7 +89,7 @@ const getModels = async (req, res, next) => {
 
     return res.status(200).json(finalResult);
   } catch (err) {
-    console.log(err);
+    //console.log(err);
     return res.status(500).json({ error: err });
   }
 };
@@ -114,7 +114,7 @@ const getIndexes = async (req, res, next) => {
 
     return res.status(200).json(finalResult);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res.status(500).json({ error: err });
   }
 };

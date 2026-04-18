@@ -4,6 +4,7 @@ const Auth = require("./auth/Auth");
 const Scrapper = require("./api/Scrapper");
 const TTS = require("./api/TTS");
 const Translator = require("./api/Translator");
+const Novel = require("./api/Novels")
 
 const Series = require("./api/Series");
 const Groups = require("./api/Groups");
@@ -17,6 +18,7 @@ module.exports = {
   ScrapperCtrl: Scrapper,
   TTSCtrl: TTS,
   TranslatorCtrl: Translator,
+  NovelCtrl: Novel,
 
   SeriesCtrl: Series,
   GroupsCtrl: Groups,

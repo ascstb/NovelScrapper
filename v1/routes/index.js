@@ -6,6 +6,7 @@ const AuthRoute = require("./api/AuthRoute");
 const ScrapperRoute = require("./api/ScrapperRoute");
 const TTSRoute = require("./api/TTSRoute");
 const TranslatorRoute = require("./api/TranslatorRoute");
+const NovelRoute = require("./api/NovelsRoute");
 
 const SeriesRoute = require("./SeriesRoute");
 const GroupsRoute = require("./api/GroupsRoute");
@@ -24,6 +25,8 @@ router.use("/", ScrapperRoute);
 router.use("/", TTSRoute);
 
 router.use("/", TranslatorRoute);
+
+router.use("/", NovelRoute);
 
 router.use("/", SeriesRoute);
 router.use("/", GroupsRoute);

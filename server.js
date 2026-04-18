@@ -13,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/pages", express.static("./pages"));
+app.use("/samples", express.static("./samples"));
 require("./middleware/express-router")(app);
 
 let server = http.createServer(app);

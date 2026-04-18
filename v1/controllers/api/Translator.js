@@ -1,5 +1,6 @@
 "use strict";
-const fs = require("fs");
+//const fs = require("fs");
+const fs = require("fs/promises");
 const axios = require("axios");
 
 const translate = async (novelName, fileName) => {
@@ -8,13 +9,14 @@ const translate = async (novelName, fileName) => {
     let englishPath = `${novelPath}/english/${fileName}`;
     let spanishPath = `${novelPath}/spanish/${fileName}`;
 
-    console.log(`Translator.js: translate: ${englishPath}`);
+    console.log(`${new Date().toLocaleString("es-MX")} - Translator.js: translate: ${englishPath}`);
 
     let result = "";
     const fileContent = fs.readFileSync(englishPath).toString();
     let paragraphs = fileContent.split("\n");
     let count = 0
     let progress = 0
+    let contextParagraph = ""
 
     for await (const paragraph of paragraphs) {
         let p = paragraph.trim();
@@ -23,10 +25,10 @@ const translate = async (novelName, fileName) => {
             continue;
         }
 
-        const baseUrl = "http://localhost:11434/api/generate";
+        const apiUrl = "http://localhost:11434/api/generate";
         const payload = {
             model: "gemma3:12b",
-            prompt: `Translate the following English text to Mexican Spanish (es-MX). Output only the translation, without any additional text or explanations.\n\nText:\n${paragraph}`,
+            prompt: `Translate the following English text to Mexican Spanish (es-MX). Output only the translation, without any additional text or explanations. context: ${contextParagraph} \n\nText to Translate:\n${paragraph}`,
             stream: false,
         };
 
@@ -35,9 +37,10 @@ const translate = async (novelName, fileName) => {
         let tempResult = tempResponse.data.response;
         result += tempResult + "\n";
 
+        contextParagraph = paragraph;
         count++;
         progress = (count / paragraphs.length) * 100;
-        console.log(`${(new Date()).toISOString()} - Translator.js: translate: ${englishPath}, progress: ${progress.toFixed(2)} %`)
+        console.log(`${new Date().toLocaleString()} - Translator.js: translate: ${englishPath}, progress: ${progress.toFixed(2)} %`)
     }
 
     var onTranslateError = function (err) {
@@ -52,6 +55,59 @@ const translate = async (novelName, fileName) => {
     return true;
 }
 
+const baseUrl = "http://localhost:11434/api/generate";
+const MAX_CONCURRENT = 5; // controla carga (ajústalo según tu PC)
+
+const translateParagraph = async (paragraph, context) => {
+    const payload = {
+        model: "gemma3:12b",
+        prompt: `Translate the following English text to Mexican Spanish (es-MX). Output only the translation.\nContext: ${context}\n\nText:\n${paragraph}`,
+        stream: false,
+    };
+
+    const { data } = await axios.post(baseUrl, payload);
+    return data.response.trim();
+};
+
+const translateV2 = async (novelName, fileName) => {
+    const rootPath = `novels`;
+    const novelPath = `${rootPath}/${novelName}`;
+    const englishPath = `${novelPath}/english/${fileName}`;
+    const spanishPath = `${novelPath}/spanish/${fileName}`;
+
+    console.log(`[${new Date().toLocaleString("es-MX")}] Translating: ${englishPath}`);
+
+    const fileContent = await fs.readFile(englishPath, "utf8");
+    const paragraphs = fileContent.split("\n").filter(p => p.trim().length > 0);
+
+    let results = [];
+    let context = "";
+
+    // 🔥 procesamiento en batches
+    for (let i = 0; i < paragraphs.length; i += MAX_CONCURRENT) {
+        const batch = paragraphs.slice(i, i + MAX_CONCURRENT);
+
+        const promises = batch.map(p => translateParagraph(p, context));
+
+        const batchResults = await Promise.all(promises);
+
+        results.push(...batchResults);
+
+        // actualizar contexto con el último del batch
+        context = batch[batch.length - 1];
+
+        const progress = ((i + batch.length) / paragraphs.length) * 100;
+
+        console.log(
+            `[${new Date().toLocaleString("es-MX")}] Progress: ${progress.toFixed(2)}%`
+        );
+    }
+
+    await fs.writeFile(spanishPath, results.join("\n"), "utf8");
+
+    return true;
+};
+
 const translateChapter = async (req, res, next) => {
     try {
         let { novelName } = req.body;
@@ -60,7 +116,8 @@ const translateChapter = async (req, res, next) => {
             return res.status(400).json({ message: "fileName param is required" });
         }
 
-        const translated = translate(novelName, fileName);
+        //const translated = translate(novelName, fileName);
+        const translated = translateV2(novelName, fileName);
 
         return res.status(200).json({ result: "process done" });
     } catch (err) {
@@ -88,7 +145,7 @@ const translateNovel = async (req, res, next) => {
         let result = [];
 
         for (const chapter of chaptersList) {
-            let translateResult = await translate(novelName, chapter);
+            let translateResult = await translateV2(novelName, chapter);
             result.push({ chapter, translateResult });
         }
 

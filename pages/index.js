@@ -72,7 +72,7 @@ const fetchChapters = (source, urlSource) => {
 //#region Table Formatters and Options
 function downloadFormatter(value, row) {
   if (!value) {
-    return `<button class="btn btn-primary btn-sm" onclick="onDownloadChapter('${row.link}')">
+    return `<button class="btn btn-primary btn-sm" onclick="onDownloadChapter(${row.chapterNumber}, '${row.link}')">
               <i class="fa fa-download"></i> Descargar
             </button>`;
   } else {
@@ -155,15 +155,15 @@ function tableDownloadButton() {
 //#endregion
 
 //#region Chapter Actions
-const onDownloadChapter = (link) => {
-  console.log("Downloading chapter: " + link);
+const onDownloadChapter = (chapterNumber, link) => {
+  console.log(`Downloading chapter: ${chapterNumber}, url: ${link}`);
   let sourceOption = $("input[name='sourceOptions']:checked").val();
-  let path = `${serverUrl}api/v1/download-chapter?source=${sourceOption}&url=${link}`;
+  let path = `${serverUrl}api/v1/download-chapter?source=${sourceOption}&chapterNumber=${chapterNumber}&url=${link}`;
   var success = function (data) {
     console.log("Chapter downloaded successfully:", data);
     Swal.fire({
       title: "Éxito",
-      text: `Capítulo descargado exitosamente.`,
+      text: `Capítulo ${chapterNumber} descargado exitosamente.`,
       icon: "success",
     });
     fetchChapters(
@@ -173,10 +173,10 @@ const onDownloadChapter = (link) => {
   };
 
   var error = function (err) {
-    console.error("Error downloading chapter:", err);
+    console.error("Error downloading chapter: ", err);
     Swal.fire({
       title: "Error",
-      text: `Ocurrió un error al descargar el capítulo.`,
+      text: `Ocurrió un error al descargar el capítulo ${chapterNumber}.`,
       icon: "error",
     });
   };
@@ -197,12 +197,26 @@ const onDownloadSelectedChapters = () => {
     });
     return;
   }
-  console.log(`Downloading selected chapters: ${selectedChapters.length}`);
+
+  let chaptersList = [];
+
+  selectedChapters.forEach((ch) => {
+    if (ch.downloaded || ch.translated || ch.converted) return
+
+    let chapterNumber = ch.fileName.replace("Capitulo-", "").replace(".txt", "");
+    chaptersList.push({
+      chapterNumber: chapterNumber,
+      link: ch.link
+    });
+  });
+
+  console.log(`Downloading selected chapters: ${chaptersList.length}`);
+  console.log(chaptersList);
 
   let params = {
     source: sourceOption,
     url: urlSource,
-    chapters: selectedChapters.map((c) => c.chapterNumber),
+    chapters: chaptersList,
   };
 
   var success = function (data) {
@@ -292,11 +306,7 @@ const onConvertSelectedChapters = () => {
   selectedChapters.forEach((ch) => {
     if (ch.converted || !ch.translated || !ch.downloaded) return
 
-    let urlParts = ch.link.split("/");
-    let chapterNumber = urlParts[urlParts.length - 1];
-    let chapterNumberPadded = ("000" + chapterNumber.toString()).slice(-4);
-    let fileName = `Capitulo-${chapterNumberPadded}.txt`;
-    chaptersList.push(fileName);
+    chaptersList.push(ch.fileName);
   });
   console.log(`Converting selected chapters: ${selectedChapters.length}`);
 

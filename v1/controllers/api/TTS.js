@@ -188,10 +188,102 @@ const generateRVC = async (req, res, next) => {
   }
 };
 
+const generateSamples = async (req, res, next) => {
+  try {
+    const apiEndpoint = "/generateSamples";
+    let { models, ttsVoices, sampleText } = req.body;
+
+    //#region Validations
+    if (!models)
+      return res.status(400).json({ error: "models param is required" });
+
+    if (!ttsVoices)
+      return res.status(400).json({ error: "ttsVoices param is required" });
+
+    if (!sampleText)
+      return res.status(400).json({ error: "sampleText param is required" });
+    //#endregion
+
+    let rootFolder = path.resolve(`samples`)
+
+    // 1. Connect to the Gradio Space (Equivalent to client = Client("..."))
+    const client = await Client.connect(spaceUrl);
+
+    const modelList = models.map(m => m.model);
+    const indexList = models.map(m => m.modelIndex);
+
+    // The input array must match the order of the Gradio function's arguments.
+    const payload = [
+      modelList,
+      indexList,
+      ttsVoices,
+      sampleText,
+      rootFolder,
+    ];
+
+    // The predict method is asynchronous and returns the result object.
+    const result = await client.predict(
+      apiEndpoint, // The API name
+      payload // The input data array
+    );
+
+    // The actual result data is typically within the 'data' array property
+    const finalResult = result.data[0];
+
+    return res.status(200).json(finalResult);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err });
+  }
+}
+
+const generateChapter = async (req, res, next) => {
+  try {
+    const apiEndpoint = "/generateAudioChapter";
+    let { novel, chapter } = req.body;
+
+    //#region Validations
+    if (!novel)
+      return res.status(400).json({ error: "novel param is required" });
+
+    if (!chapter)
+      return res.status(400).json({ error: "chapter param is required" });
+    //#endregion
+
+    let rootFolder = path.resolve(`novels`)
+
+    // 1. Connect to the Gradio Space (Equivalent to client = Client("..."))
+    const client = await Client.connect(spaceUrl);
+
+    // The input array must match the order of the Gradio function's arguments.
+    const payload = [
+      rootFolder,
+      novel,
+      chapter
+    ];
+
+    // The predict method is asynchronous and returns the result object.
+    const result = await client.predict(
+      apiEndpoint, // The API name
+      payload // The input data array
+    );
+
+    // The actual result data is typically within the 'data' array property
+    const finalResult = result.data[0];
+
+    return res.status(200).json(finalResult);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err });
+  }
+}
+
 module.exports = {
   functionTest,
   getVoices,
   getModels,
   getIndexes,
   generateRVC,
+  generateSamples,
+  generateChapter
 };

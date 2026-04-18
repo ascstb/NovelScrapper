@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Novel Scrapper">
+    <meta name="author" content="Arturo Sanchez">
+    <title>Editor - Novel Scrapper</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <link href="/pages/vendor/sweetalert2/dist/sweetalert2.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.css">
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+
+    <link href="/pages/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/pages/css/index.css" rel="stylesheet">
+
+    <link href="/pages/vendor/wizard/boostrap-wizard.css" rel="stylesheet" />
+    <style>
+        div.toggle.btn {
+            min-width: 130px;
+            padding-bottom: 30px;
+        }
+
+        .list-group-item.selected {
+            background-color: #4e73df;
+            color: white;
+        }
+
+        .editor-container {
+            border: 1px solid #ced4da;
+            padding: 10px;
+            min-height: 100px;
+            border-radius: .25rem;
+        }
+
+        .list-group-item {
+            cursor: grab;
+        }
+
+        .list-group-item:active {
+            cursor: grabbing;
+        }
+
+        #charactersContainer {
+            position: fixed;
+            top: 250px;
+            left: 20px;
+            width: 250px;
+            z-index: 1050;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        /*#ulCharacters .list-group-item {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            cursor: grab;
+        }
+
+        #ulCharacters .list-group-item:active {
+            cursor: grabbing;
+        }*/
+
+        .character {
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /*.Narrador {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .Sunny {
+            background-color: #0c1620;
+            color: white;
+        }
+
+        .Nephis {
+            background-color: #eaeeee;
+            color: rgb(84, 86, 87);
+        }
+
+        .Cassia {
+            background-color: #02611d;
+            color: white;
+        }
+
+        .Hechizo {
+            background-color: #180464;
+            color: white;
+        }*/
+    </style>
+</head>
+
+<body id="page-top">
+    <!--#region Page Wrapper -->
+    <div id="wrapper">
+        <!--#region Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/pages/index.html">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Novel Scrapper</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Menu Items -->
+            <li class="nav-item">
+                <a class="nav-link" href="/pages/index.html">
+                    <i class="fas fa-fw fa-file-arrow-down"></i>
+                    <span>Scrapper</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/pages/series/series.html">
+                    <i class="fas fa-fw fa-book"></i>
+                    <span>Series</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/pages/groups/group.html">
+                    <i class="fas fa-fw fa-layer-group"></i>
+                    <span>Groups</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/pages/chapters/chapter.html">
+                    <i class="fas fa-fw fa-book-open"></i>
+                    <span>Chapters</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <li class="nav-item active">
+                <a class="nav-link" href="/pages/editor/editor.html">
+                    <i class="fas fa-fw fa-pen-to-square"></i>
+                    <span>Editor</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/pages/sampler/sampler.html">
+                    <i class="fas fa-fw fa-eye-dropper"></i>
+                    <span>Sampler</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/pages/characters/characters.html">
+                    <i class="fas fa-fw fa-user-group"></i>
+                    <span>Characters</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/pages/voices/voices.html">
+                    <i class="fas fa-fw fa-microphone-lines"></i>
+                    <span>Voices</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+        </ul>
+        <!--#endregion End of Sidebar -->
+
+        <!--#region Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!--#region Main Content -->
+            <div id="content">
+                <!--#region Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span id="sUserName" class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas
+                                    McGee</span>
+                                <img id="iUserProfilePicture" class="img-profile rounded-circle"
+                                    src="img/undraw_profile.svg">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Perfil
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Configuración
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!--#endregion End of Topbar -->
+
+                <!--#region Begin Page Content -->
+                <div class="container-fluid">
+                    <!--#region Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Editor</h1>
+                        <button class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="onEditCharacter()">
+                            <i class="fas fa-user-plus fa-sm text-white-50"></i> Agregar Personaje
+                        </button>
+                    </div>
+                    <!--#endregion Page Heading  -->
+
+                    <!-- Content Row -->
+                    <div class="row">
+                        <div id="mainContainer" class="container-fluid">
+                            <div class="row">
+                                <label class="col-sm-2 text-right" for="ddlNovel">Novela</label>
+                                <div class="col-sm-10">
+                                    <select id="ddlNovel" data-live-search="true" data-width="100%"
+                                        title="Selecciona una novela">
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="charactersContainer">
+                                <div class="col-sm-12">
+                                    <input type="text" id="txtCharacterFilter" class="form-control" />
+                                </div>
+                                <div class="col-sm-12">
+                                    <ul id="ulCharacters" class="list-group selectable-list"></ul>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="input-group mb-3">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="inputGroupFile02">
+                                        <label class="custom-file-label" for="inputGroupFile02">Elegir archivo</label>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button"
+                                            onclick="onUploadFile()"><i class="fa fa-upload"></i> Subir</button>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-info" type="button"
+                                            onclick="onCleanFile()"><i class="fa fa-broom"></i> Limpiar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-11">
+                                    <div id="editor" class="editor-container" contenteditable="true">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <button type="button" class="btn btn-primary" onclick="onSaveFile()">
+                                    <i class="fa fa-save"></i> Guardar Capítulo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!--#endregion End Page Content  -->
+
+                <div id="loaderContainer" style="display: none;">
+                    <div id="dLoader" class="spinner-border text" role="status">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+                    <label id="loaderMessage">Cargando...</label>
+                </div>
+
+            </div>
+            <!--#endregion End of Main Content -->
+
+            <!--#region Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; R2 Dev Pros 2020</span>
+                    </div>
+                </div>
+            </footer>
+            <!--#endregion End of Footer -->
+
+        </div>
+        <!--#endregion End of Content Wrapper -->
+
+    </div>
+    <!--#endregion End of Page Wrapper -->
+
+    <!--#region Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">¿Listo(a) para salir?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Selecciona "Cerrar Sesión" abajo si estás listo(a) para terminar tu sesión
+                    actual.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-primary" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--#endregion  -->
+
+    <!--#region Character Modal-->
+    <div class="modal fade" id="characterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Editar Personaje</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <label class="col-sm-4" for="txtCharacterName">Nombre del Personaje</label>
+                        <div class="col-sm-8">
+                            <input id="txtCharacterName" type="text" class="form-control"
+                                placeholder="Nombre del personaje" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="backgroundColorPicker">Color de Fondo</label>
+                        <div class="col-sm-8">
+                            <input type="color" id="backgroundColorPicker" class="form-control" value="#007bff"
+                                title="Elige un color de fondo">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="textColorPicker">Color de Texto</label>
+                        <div class="col-sm-8">
+                            <input type="color" id="textColorPicker" class="form-control" value="#ffffff"
+                                title="Elige un color de texto">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="ddlVoiceModel">Modelo de Voz</label>
+                        <div class="col-sm-8">
+                            <select id="ddlVoiceModel" data-live-search="true" data-width="100%"
+                                title="Selecciona un modelo de voz">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="ddlVoiceModelIndex">Indice de Modelo</label>
+                        <div class="col-sm-8">
+                            <select id="ddlVoiceModelIndex" data-live-search="true" data-width="100%"
+                                title="Selecciona un indice de modelo">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="ddlTTSVoice">Voz TTS</label>
+                        <div class="col-sm-8">
+                            <select id="ddlTTSVoice" data-live-search="true" data-width="100%"
+                                title="Selecciona una voz TTS">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-primary" id="btnUpdateCharacter" onclick="onUpdateCharacter()">Guardar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--#endregion  -->
+
+    <!--#region Scripts  -->
+    <!-- Bootstrap core JavaScript-->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+        integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="/pages/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/pages/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <script type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/pages/js/sb-admin-2.min.js"></script>
+    <!--#endregion  -->
+
+    <!--#region Boostrap Toggle  -->
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <!--#endregion  -->
+
+    <!--#region Handlebars -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
+    <script type="text/javascript" src="/pages/js/handlebars-extensions.js"></script>
+    <!--#endregion  -->
+
+    <!--#region Boostrap Table -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/bootstrap-table-locale-all.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.5/dist/extensions/export/bootstrap-table-export.min.js"></script>
+    <!--#endregion -->
+
+    <!--#region Boostrap Date Picker  -->
+    <link href="/pages/vendor/monim67-datepicker/datetimepicker.min.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="/pages/vendor/monim67-datepicker/datetimepicker.min.js"></script>
+    <!--#endregion  -->
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
+    <!-- (Optional) Latest compiled and minified JavaScript translation files -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/i18n/defaults-*.min.js"></script>
+
+    <script type="text/javascript" src="/pages/vendor/phstc-dateFormat/jquery-dateformat.js"></script>
+
+    <script type="text/javascript" src="/pages/vendor/wizard/boostrap-wizard.js"></script>
+
+    <script type="text/javascript" src="/pages/repository.js"></script>
+    <script type="text/javascript" src="/pages/utils.js"></script>
+    <script type="text/javascript" src="/pages/session.js"></script>
+    <script type="text/javascript" src="/pages/editor/editor.js"></script>
+</body>
+
+</html>

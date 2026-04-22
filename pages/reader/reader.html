@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Novel Scrapper">
     <meta name="author" content="Arturo Sanchez">
-    <title>Voices - Novel Scrapper</title>
+    <title>Reader - Novel Scrapper</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -32,9 +32,43 @@
             padding-bottom: 30px;
         }
 
-        .list-group-item.selected {
-            background-color: #4e73df;
-            color: white;
+        body {
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .reader-container {
+            margin: auto;
+            padding: 50px;
+            transition: all 0.3s;
+        }
+
+        #reader {
+            white-space: pre-wrap;
+        }
+
+        /* Default (light) */
+        body.light {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Dark mode */
+        body.dark {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .controls {
+            position: sticky;
+            top: 0;
+            background: inherit;
+            padding: 10px;
+            z-index: 10;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .slider-label {
+            font-size: 12px;
         }
     </style>
 </head>
@@ -88,7 +122,7 @@
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="/pages/reader/reader.html">
                     <i class="fas fa-fw fa-pen-to-square"></i>
                     <span>Reader</span>
@@ -116,7 +150,7 @@
                 </a>
             </li>
 
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="/pages/voices/voices.html">
                     <i class="fas fa-fw fa-microphone-lines"></i>
                     <span>Voices</span>
@@ -183,60 +217,74 @@
                 <div class="container-fluid">
                     <!--#region Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Voces</h1>
-                        <!-- <button class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="onNewCharacter()">
+                        <h1 class="h3 mb-0 text-gray-800">Editor</h1>
+                        <button class="d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="onEditCharacter()">
                             <i class="fas fa-user-plus fa-sm text-white-50"></i> Agregar Personaje
-                        </button> -->
+                        </button>
                     </div>
                     <!--#endregion Page Heading  -->
 
                     <!-- Content Row -->
                     <div class="row">
                         <div id="mainContainer" class="container-fluid">
-                            <div class="container mt-3">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-1">
-                                        <button id="btnAudioPlay" class="btn btn-secondary">▶</button>
-                                    </div>
-
-                                    <div class="col-sm-8">
-                                        <input type="range" id="audioProgress" value="0" min="0" max="100"
-                                            class="w-100">
-                                    </div>
-
-                                    <div class="col-sm-3 text-right">
-                                        <span id="audioTime">0:00 / 0:00</span>
-                                    </div>
+                            <div class="row">
+                                <label class="col-sm-2 text-right" for="ddlNovel">Novela</label>
+                                <div class="col-sm-10">
+                                    <select id="ddlNovel" data-live-search="true" data-width="100%"
+                                        title="Selecciona una novela">
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2 text-right" for="ddlNovel">Capítulos</label>
+                                <div class="col-sm-10">
+                                    <select id="ddlChapters" data-live-search="true" data-width="100%"
+                                        title="Selecciona un Capítulo">
+                                        <!-- Options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2 text-right">Tema</label>
+                                <div class="col-sm-10">
+                                    <button id="btnThemeWhite" class="btn btn-light">White</button>
+                                    <button id="btnThemeDark" class="btn btn-dark">Dark</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2 text-right">Tamaño de Texto</label>
+                                <div class="col-sm-10">
+                                    <button id="fontMinus" class="btn btn-secondary">A-</button>
+                                    <button id="fontPlus" class="btn btn-secondary">A+</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2 text-right">Tamaño de Contenedor</label>
+                                <div class="col-sm-10">
+                                    <input type="range" id="rContainerWidth" min="400" max="1800" value="800">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2 text-right">Espaciado de Texto</label>
+                                <div class="col-sm-10">
+                                    <input type="range" id="rLineSpacing" min="1" max="3" step="0.1" value="1.8">
                                 </div>
                             </div>
 
-                            <audio id="audioPreview"></audio>
+                            <!-- Reader -->
+                            <div id="readerContainer" class="reader-container" style="max-width: 1800px;">
+                                <div id="dReader" style="font-size: 18px; line-height: 1.8;">
+                                    
+                                </div>
+                            </div>
 
-                            <table id="voicesTable" class="table table-striped" data-toggle="table" data-search="true"
-                                data-pagination="true" data-page-size="50" data-page-list="[10,25,50,100,200,500,1000]"
-                                data-click-to-select="true" data-toolbar="#toolbar" data-locale="es-MX"
-                                data-sortable="true" data-sort-name="modelName" data-sort-order="asc"
-                                data-buttons="tableDownloadButton" data-filter-control="true"
-                                data-show-search-clear-button="true">
-                                <thead>
-                                    <tr>
-                                        <th data-field="filePath" data-formatter="editFormatter"></th>
-                                        <th data-field="filePath" data-formatter="sampleFormatter"></th>
-                                        <th data-field="country" data-formatter="countryFormatter">País</th>
-                                        <th data-field="group">Agrupador</th>
-                                        <th data-field="model">Modelo</th>
-                                        <th data-field="voiceName">Voz</th>
-                                        <th data-field="gender">Género</th>
-                                        <th data-field="minAge" data-formatter="ageRangeFormatter">Edad</th>
-                                        <th data-field="pitch">Tono</th>
-                                        <th data-field="timbre">Timbre</th>
-                                        <th data-field="texture">Textura</th>
-                                        <th data-field="energy">Energía</th>
-                                        <th data-field="speed">Velocidad</th>
-                                        <th data-field="temperament">Temperamento</th>
-                                    </tr>
-                                </thead>
-                            </table>
+                            <div class="text-center">
+                                <button type="button" class="btn btn-primary" onclick="onPrevChapter()">
+                                    <i class="fa fa-arrow-left"></i> Anterior</button>
+                                <button type="button" class="btn btn-primary" onclick="onNextChapter()">
+                                    <i class="fa fa-arrow-right"></i> Siguiente</button>
+                            </div>
                         </div>
                     </div>
 
@@ -269,110 +317,6 @@
     </div>
     <!--#endregion End of Page Wrapper -->
 
-    <!--#region Voices Modal-->
-    <div class="modal fade" id="voicesModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Editar Voz</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <label class="col-sm-4" for="txtLanguage">Idioma</label>
-                        <div class="col-sm-8">
-                            <input id="txtLanguage" type="text" class="form-control"
-                                placeholder="es, en, fr" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtGroup">Agrupador</label>
-                        <div class="col-sm-8">
-                            <input id="txtGroup" type="text" class="form-control" placeholder="Serie, Pelicula, Grupo..." />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtModel">Modelo</label>
-                        <div class="col-sm-8">
-                            <input id="txtModel" type="text" class="form-control" placeholder="Modelo" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtVoice">Voz</label>
-                        <div class="col-sm-8">
-                            <input id="txtVoice" type="text" class="form-control" placeholder="Voz" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtMinAge">Edad Mínima</label>
-                        <div class="col-sm-8">
-                            <input id="txtMinAge" type="number" min="4" max="80" class="form-control"
-                                placeholder="4" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtMaxAge">Edad Máxima</label>
-                        <div class="col-sm-8">
-                            <input id="txtMaxAge" type="number" min="4" max="80" class="form-control"
-                                placeholder="80" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtTone">Tono</label>
-                        <div class="col-sm-8">
-                            <input id="txtTone" type="text" class="form-control"
-                                placeholder="Grave, Agudo, Medio" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtTimbre">Timbre</label>
-                        <div class="col-sm-8">
-                            <input id="txtTimbre" type="text" class="form-control"
-                                placeholder="Oscuro, Brillante, Cálido, Neutral" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtTexture">Textura</label>
-                        <div class="col-sm-8">
-                            <input id="txtTexture" type="text" class="form-control"
-                                placeholder="Suave, Rasposa, Limpia, Firme" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtEnergy">Energía</label>
-                        <div class="col-sm-8">
-                            <input id="txtEnergy" type="text" class="form-control"
-                                placeholder="Media, Alta, Baja, Muy Alta" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtSpeed">Velocidad</label>
-                        <div class="col-sm-8">
-                            <input id="txtSpeed" type="text" class="form-control"
-                                placeholder="Media, Rápida, Lenta" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label class="col-sm-4" for="txtTemperament">Temperamento</label>
-                        <div class="col-sm-8">
-                            <input id="txtTemperament" type="text" class="form-control"
-                                placeholder="Alegre, Calmado, Entusiasta, Convincente" />
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
-                    <a class="btn btn-primary" id="btnUpdateSeries" onclick="onUpdateSeries()">Guardar</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--#endregion  -->
-
-
     <!--#region Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
@@ -389,6 +333,75 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
                     <a class="btn btn-primary" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--#endregion  -->
+
+    <!--#region Character Modal-->
+    <div class="modal fade" id="characterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Editar Personaje</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <label class="col-sm-4" for="txtCharacterName">Nombre del Personaje</label>
+                        <div class="col-sm-8">
+                            <input id="txtCharacterName" type="text" class="form-control"
+                                placeholder="Nombre del personaje" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="backgroundColorPicker">Color de Fondo</label>
+                        <div class="col-sm-8">
+                            <input type="color" id="backgroundColorPicker" class="form-control" value="#007bff"
+                                title="Elige un color de fondo">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="textColorPicker">Color de Texto</label>
+                        <div class="col-sm-8">
+                            <input type="color" id="textColorPicker" class="form-control" value="#ffffff"
+                                title="Elige un color de texto">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="ddlVoiceModel">Modelo de Voz</label>
+                        <div class="col-sm-8">
+                            <select id="ddlVoiceModel" data-live-search="true" data-width="100%"
+                                title="Selecciona un modelo de voz">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="ddlVoiceModelIndex">Indice de Modelo</label>
+                        <div class="col-sm-8">
+                            <select id="ddlVoiceModelIndex" data-live-search="true" data-width="100%"
+                                title="Selecciona un indice de modelo">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-4" for="ddlTTSVoice">Voz TTS</label>
+                        <div class="col-sm-8">
+                            <select id="ddlTTSVoice" data-live-search="true" data-width="100%"
+                                title="Selecciona una voz TTS">
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-primary" id="btnUpdateCharacter" onclick="onUpdateCharacter()">Guardar</a>
                 </div>
             </div>
         </div>
@@ -449,7 +462,7 @@
     <script type="text/javascript" src="/pages/repository.js"></script>
     <script type="text/javascript" src="/pages/utils.js"></script>
     <script type="text/javascript" src="/pages/session.js"></script>
-    <script type="text/javascript" src="/pages/voices/voices.js"></script>
+    <script type="text/javascript" src="/pages/reader/reader.js"></script>
 </body>
 
 </html>

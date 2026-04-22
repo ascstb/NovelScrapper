@@ -311,6 +311,38 @@ IMPORTANT:
     return true;
 };
 
+const getNovelChapters = async (req, res) => {
+    try {
+        let { novel, language } = req.body;
+
+        //#region Validations
+        if (!novel) {
+            return res.status(400).json({ error: "novel param is required" });
+        }
+
+        if (!language) {
+            language = "spanish"
+        }
+        //#endregion
+
+        let rootPath = "novels";
+        let folderPath = path.join(rootPath, novel, language);
+        const files = await fs.readdir(folderPath);
+
+        // filter only .txt files
+        const txtFiles = files
+            .filter(file => path.extname(file) === ".txt")
+            .map(file => ({
+                name: file,
+                path: path.join(folderPath, file)
+            }));
+
+        res.json(txtFiles);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Failed to retrieve novel chapters" });
+    }
+};
 
 module.exports = {
     getSamples,
@@ -318,5 +350,6 @@ module.exports = {
     getCharacters,
     updateCharacters,
     getVoices,
-    assignCharacters
+    assignCharacters,
+    getNovelChapters
 }

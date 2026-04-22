@@ -3,8 +3,8 @@ const fetch = global.fetch; // Node 18+
 const API_URL = "http://localhost:3700/api/v1/generateChapter";
 
 const NOVEL = "shadow slave";
-const START = 86;
-const END = 95;
+const START = 96;
+const END = 98;
 
 let current = START;
 

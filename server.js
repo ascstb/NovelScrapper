@@ -14,6 +14,7 @@ app.use(express.json());
 
 app.use("/pages", express.static("./pages"));
 app.use("/samples", express.static("./samples"));
+app.use("/novels", express.static("./novels"));
 require("./middleware/express-router")(app);
 
 let server = http.createServer(app);

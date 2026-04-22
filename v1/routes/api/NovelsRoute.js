@@ -11,5 +11,6 @@ router.get("/novels/characters", NovelCtrl.getCharacters);
 router.post("/novels/character", NovelCtrl.updateCharacters);
 router.get("/novels/voices", NovelCtrl.getVoices);
 router.post("/novels/assingCharacters", NovelCtrl.assignCharacters);
+router.post("/novels/getChapters", NovelCtrl.getNovelChapters);
 
 module.exports = router;

@@ -108,6 +108,55 @@ const translateV2 = async (novelName, fileName) => {
     return true;
 };
 
+const translateV3 = async (novelName, fileName) => {
+    const rootPath = `novels`;
+    const novelPath = `${rootPath}/${novelName}`;
+    const englishPath = `${novelPath}/english/${fileName}`;
+    const spanishPath = `${novelPath}/spanish/${fileName}`;
+
+    console.log(`[${new Date().toLocaleString("es-MX")}] Translating: ${englishPath}`);
+
+    const fileContent = await fs.readFile(englishPath, "utf8");
+
+    // split paragraphs
+    const paragraphs = fileContent
+        .split("\n")
+        .filter(p => p.trim().length > 0);
+
+    // 🔥 agrupar de 2 en 2
+    const paragraphPairs = [];
+    for (let i = 0; i < paragraphs.length; i += 2) {
+        paragraphPairs.push(paragraphs.slice(i, i + 2).join("\n"));
+    }
+
+    let results = [];
+    let context = "";
+
+    // 🔥 procesamiento en batches
+    for (let i = 0; i < paragraphPairs.length; i += MAX_CONCURRENT) {
+        const batch = paragraphPairs.slice(i, i + MAX_CONCURRENT);
+
+        const promises = batch.map(p => translateParagraph(p, context));
+
+        const batchResults = await Promise.all(promises);
+
+        results.push(...batchResults);
+
+        // actualizar contexto con el último del batch (puedes ajustar esto)
+        context = batch[batch.length - 1];
+
+        const progress = ((i + batch.length) / paragraphPairs.length) * 100;
+
+        console.log(
+            `[${new Date().toLocaleString("es-MX")}] Progress: ${progress.toFixed(2)}%`
+        );
+    }
+
+    await fs.writeFile(spanishPath, results.join("\n"), "utf8");
+
+    return true;
+};
+
 const translateChapter = async (req, res, next) => {
     try {
         let { novelName } = req.body;
@@ -117,7 +166,7 @@ const translateChapter = async (req, res, next) => {
         }
 
         //const translated = translate(novelName, fileName);
-        const translated = translateV2(novelName, fileName);
+        const translated = translateV3(novelName, fileName);
 
         return res.status(200).json({ result: "process done" });
     } catch (err) {

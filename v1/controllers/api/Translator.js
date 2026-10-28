@@ -115,7 +115,6 @@ const translateV3 = async (novelName, fileName) => {
     const englishPath = `${novelPath}/english/${fileName}`;
     const spanishPath = `${novelPath}/spanish/${fileName}`;
 
-<<<<<<< HEAD
     console.log(`[${new Date().toISOString()}] Translating: ${englishPath}`);
 
     const fileContent = await fs.readFile(englishPath, "utf-8");
@@ -124,32 +123,22 @@ const translateV3 = async (novelName, fileName) => {
     const paragraphs = fileContent.split("\n").filter(p => p.trim().length > 0);
 
     // group 2 by 2
-=======
-    console.log(`[${new Date().toLocaleString("es-MX")}] Translating: ${englishPath}`);
-
-    const fileContent = await fs.readFile(englishPath, "utf8");
-
-    // split paragraphs
-    const paragraphs = fileContent
-        .split("\n")
-        .filter(p => p.trim().length > 0);
-
-    // 🔥 agrupar de 2 en 2
->>>>>>> 0bca660bcd1f96e191e0d8912c7e3d1bad230965
     const paragraphPairs = [];
     for (let i = 0; i < paragraphs.length; i += 2) {
         paragraphPairs.push(paragraphs.slice(i, i + 2).join("\n"));
     }
 
-<<<<<<< HEAD
-    // batch process
+    let results = [];
+    let context = "";
+
+    // Process paragraph pairs in concurrent batches.
     for (let i = 0; i < paragraphPairs.length; i += MAX_CONCURRENT) {
         const batch = paragraphPairs.slice(i, i + MAX_CONCURRENT);
         const promises = batch.map(p => translateParagraph(p, context));
         const batchResults = await Promise.all(promises);
         results.push(...batchResults);
 
-        //update context iwth last batch
+        // Use the last pair as context for the next batch.
         context = batch[batch.length - 1];
 
         const progress = ((i + batch.length) / paragraphPairs.length) * 100;
@@ -157,32 +146,6 @@ const translateV3 = async (novelName, fileName) => {
     }
 
     await fs.writeFile(spanishPath, results.join("\n"), "utf-8");
-=======
-    let results = [];
-    let context = "";
-
-    // 🔥 procesamiento en batches
-    for (let i = 0; i < paragraphPairs.length; i += MAX_CONCURRENT) {
-        const batch = paragraphPairs.slice(i, i + MAX_CONCURRENT);
-
-        const promises = batch.map(p => translateParagraph(p, context));
-
-        const batchResults = await Promise.all(promises);
-
-        results.push(...batchResults);
-
-        // actualizar contexto con el último del batch (puedes ajustar esto)
-        context = batch[batch.length - 1];
-
-        const progress = ((i + batch.length) / paragraphPairs.length) * 100;
-
-        console.log(
-            `[${new Date().toLocaleString("es-MX")}] Progress: ${progress.toFixed(2)}%`
-        );
-    }
-
-    await fs.writeFile(spanishPath, results.join("\n"), "utf8");
->>>>>>> 0bca660bcd1f96e191e0d8912c7e3d1bad230965
 
     return true;
 };
@@ -196,10 +159,7 @@ const translateChapter = async (req, res, next) => {
         }
 
         //const translated = translate(novelName, fileName);
-<<<<<<< HEAD
         // const translated = translateV2(novelName, fileName);
-=======
->>>>>>> 0bca660bcd1f96e191e0d8912c7e3d1bad230965
         const translated = translateV3(novelName, fileName);
 
         return res.status(200).json({ result: "process done" });

@@ -5,12 +5,16 @@ const localhost = {
     port: 3000,
   },
   db: {
-    uri: "mongodb+srv://ascstb:KPYXYaxBUBNbiaDh@cluster0.bgdmzep.mongodb.net/novelScrapper",
+    uri: process.env.MONGODB_URI,
   },
 };
 
 const config = {
   localhost,
 };
+
+if (config[env] && !config[env].db.uri) {
+  throw new Error("MONGODB_URI is required. Set it in the process environment before starting the server.");
+}
 
 module.exports = config[env];

@@ -19,6 +19,10 @@ require("./middleware/express-router")(app);
 
 let server = http.createServer(app);
 
+const logDatabaseError = () => {
+  console.error("MongoDB connection failed. Check MONGODB_URI and database availability.");
+};
+
 const connect = () => {
   const dbConfig = require("./config/db");
   const options = {
@@ -28,9 +32,7 @@ const connect = () => {
   };
   const uri = dbConfig.db.uri;
 
-  mongoose.connect(uri, options).catch((err) => {
-    return console.log(err, "Mongo Error");
-  });
+  mongoose.connect(uri, options).catch(logDatabaseError);
   return mongoose.connection;
 };
 
@@ -62,7 +64,7 @@ const onListening = () => {
 const connection = connect();
 
 connection
-  .on("error", console.log)
+  .on("error", logDatabaseError)
   .on("disconnected", connect)
   .once("open", listen);
 

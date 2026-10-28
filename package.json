@@ -22,9 +22,11 @@
   },
   "homepage": "https://github.com/ascstb/NovelScrapper#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1063.0",
     "@gradio/client": "^1.19.1",
     "@langchain/community": "^1.1.27",
     "@langchain/core": "^1.1.39",
+    "@vitalets/google-translate-api": "^9.2.1",
     "axios": "^1.12.2",
     "chromadb": "^3.4.3",
     "cors": "^2.8.5",
